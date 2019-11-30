@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { darken } from 'polished';
 
 export const Container = styled.View`
     flex: 1;
@@ -13,7 +14,7 @@ export const ProductContainer = styled.View`
     margin: 15px;
     border-radius: 4px;
     width: 220px;
-    max-height: 360px;
+    max-height: 400px;
 `;
 
 export const ProductImage = styled.Image`
@@ -44,6 +45,24 @@ export const AddButton = styled.TouchableOpacity`
     justify-content: center;
 `;
 
+export const CartIconContainer = styled.View`
+    flex: 1;
+    padding: 9px;
+    background: ${darken(0.1, '#7159c1')};
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    flex-direction: row;
+    align-items: center;
+    
+`;
+
+export const AmountInCart = styled.Text`
+    color: #fff;
+    padding-left: 5px;
+`;
+
 export const AddButtonText = styled.Text`
+    padding-right: 40px;
+    padding-left: 30px;
     color: #fff;
 `;

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 import api from '../../services/api';
 import { formatPrice } from '../../util/format';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { 
     Container,
@@ -10,31 +11,14 @@ import {
     ProductTitle, 
     ProductPrice, 
     AddButton,
+    CartIconContainer,
+    AmountInCart,
     AddButtonText,
 } from './styles';
 
-export default function Main() {
-    // const DATA = [
-    //     {
-    //         id: '#259',
-    //         image: 'https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_detalhe2.jpg?ims=326x',
-    //         title: 'Tênis AR Pretty Edition',
-    //         price: 'R$ 199,99',
-    //     },
-    //     {
-    //         id: '#258',
-    //         image: 'https://static.netshoes.com.br/produtos/kit-2-pares-tenis-kappa-impact-masculino/04/D24-1981-304/D24-1981-304_detalhe2.jpg?ims=326x',
-    //         title: 'Tênis AR Beautiful Edition',
-    //         price: 'R$ 299,99',
-    //     },
-    //     {
-    //         id: '#257',
-    //         image: 'https://static.netshoes.com.br/produtos/tenis-esporte-adaption-masculino/14/KTM-0031-014/KTM-0031-014_detalhe2.jpg?ims=326x',
-    //         title: 'Tênis AR Fifteen Edition',
-    //         price: 'R$ 159,99',
-    //     },
-    // ];
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
+export default function Main() {
 
     const [ products, setProduct ] = useState([]);
 
@@ -53,6 +37,21 @@ export default function Main() {
         loadProducts();
     }, []);
 
+    const dispatch = useDispatch();
+
+    function addProduct(product) {
+        dispatch({
+            type: '@cart/ADD',
+            product,
+        });
+    };
+
+    const amount = useSelector(
+        state => state.cart.reduce((amount, product) => {
+            amount[product.id] = product.amount;
+            return amount;
+    }, {}));
+
     return (
         <Container>
             <FlatList 
@@ -62,7 +61,11 @@ export default function Main() {
                         <ProductImage source={{ uri: item.image }} />
                         <ProductTitle>{item.title}</ProductTitle>
                         <ProductPrice>{item.formattedPrice}</ProductPrice>
-                        <AddButton>
+                        <AddButton onPress={() => addProduct(item)}>
+                            <CartIconContainer>
+                                <Icon name='add-shopping-cart' size={20} color='#fff'/>
+                                <AmountInCart>{amount[item.id] || 0}</AmountInCart>
+                            </CartIconContainer>
                             <AddButtonText>ADICIONAR</AddButtonText>
                         </AddButton>
                     </ProductContainer>

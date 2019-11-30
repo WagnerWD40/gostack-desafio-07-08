@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { View, Image, Text } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 
 import logo from '../../assets/images/logo.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -14,7 +14,7 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function Header({ navigation }) {
-
+    const cartSize = useSelector(state => state.cart.length);
 
     return (
         <Container>
@@ -23,7 +23,7 @@ export default function Header({ navigation }) {
             </TouchableOpacity>
             <IconContainer onPress={() => navigation.navigate('Cart')}>
                 <Icon name='shopping-basket' color='#FFF' size={24} />
-                <BasketItemsAmount>0</BasketItemsAmount>
+                <BasketItemsAmount>{cartSize}</BasketItemsAmount>
             </IconContainer>
         </Container>
     );

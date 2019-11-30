@@ -12,6 +12,17 @@ export const CartContainer = styled.View`
     padding: 20px;
 `;
 
+export const EmptyCart = styled.View`
+    justify-content: center;
+    align-items: center;
+`;
+
+export const EmptyCartText = styled.Text`
+    font-size: 22;
+    font-weight: bold;
+    margin-top: 10px;
+`;
+
 export const ProductList = styled.FlatList`
 
 `;

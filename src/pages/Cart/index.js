@@ -1,8 +1,11 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { 
     Container,
     CartContainer,
+    EmptyCart,
+    EmptyCartText,
     ProductList,
     ProductContainer,
     ProductInnerTopContainer,
@@ -24,64 +27,93 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+import { formatPrice } from '../../util/format';
+
 export default function Cart () {
-    const CART_DATA = [
-        {
-            id: '#259',
-            image: 'https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_detalhe2.jpg?ims=326x',
-            title: 'Tênis AR Pretty Edition',
-            price: 'R$ 199,99',
-            amount: 1,
-        },
-        {
-            id: '#257',
-            image: 'https://static.netshoes.com.br/produtos/tenis-esporte-adaption-masculino/14/KTM-0031-014/KTM-0031-014_detalhe2.jpg?ims=326x',
-            title: 'Tênis AR Fifteen Edition',
-            price: 'R$ 159,99',
-            amount: 2,
-        },
-    ];
+
+    const cart = useSelector(state => state.cart.map(product => ({
+        ...product,
+        subtotal: formatPrice(product.price * product.amount),
+    })));
+
+    const total = formatPrice(cart.reduce(
+        (total, product) => total + product.price * product.amount, 0
+    ));
+
+    const dispatch = useDispatch();
+
+    function removeFromCart(product) {
+        dispatch({
+            type: '@cart/REMOVE',
+            product,
+        });
+    };
+
+    function incrementAmount(product) {
+        dispatch({
+            type: '@cart/UPDATE',
+            product,
+            newProductAmount: product.amount + 1,
+        });
+    };
+
+    function decrementAmount(product) {
+        dispatch({
+            type: '@cart/UPDATE',
+            product,
+            newProductAmount: product.amount - 1,
+        });
+    };
 
     return (
         <Container>
             <CartContainer>
-                <ProductList
-                    data={CART_DATA}
+                {cart.length > 0 ? (
+                    <>
+                    <ProductList
+                    data={cart}
                     renderItem={({ item }) => (
                         <ProductContainer>
                             <ProductInnerTopContainer>
                                 <ProductImage source={{ uri: item.image }} />
                                 <ProductDetails>
                                     <ProductTitle>{item.title}</ProductTitle>
-                                    <ProductPrice>{item.price}</ProductPrice>
+                                    <ProductPrice>{item.formattedPrice}</ProductPrice>
                                 </ProductDetails>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => removeFromCart(item)}>
                                     <Icon name='delete-forever' size={28} color='#7159c1' />
                                 </TouchableOpacity>
                             </ProductInnerTopContainer>
                             <ProductInnerBottomContainer>
                                 <AmountContainer>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => decrementAmount(item)}>
                                         <Icon name='remove-circle-outline' size={20} color='#7159c1' />
                                     </TouchableOpacity>
-                                    <ProductAmount>12</ProductAmount>
-                                    <TouchableOpacity>
+                                    <ProductAmount>{item.amount}</ProductAmount>
+                                    <TouchableOpacity onPress={() => incrementAmount(item)}>
                                         <Icon name='add-circle-outline' size={20} color='#7159c1' />
                                     </TouchableOpacity>
                                 </AmountContainer>
-                                <ProductSubtotal>R$ 250,00</ProductSubtotal>
+                                <ProductSubtotal>{item.subtotal}</ProductSubtotal>
                             </ProductInnerBottomContainer>
                         </ProductContainer>
                     )}
-                    keyExtractor={item => item.id}
-                />
-                <TotalContainer>
-                    <Total>TOTAL</Total>
-                    <TotalValor>R$ 1619,10</TotalValor>
-                </TotalContainer>
-                <CheckoutButton>
-                    <CheckoutButtonText>FINALIZAR PEDIDO</CheckoutButtonText>
-                </CheckoutButton>
+                    keyExtractor={item => String(item.id)}
+                    />
+                    <TotalContainer>
+                        <Total>TOTAL</Total>
+                        <TotalValor>{total}</TotalValor>
+                    </TotalContainer>
+                    <CheckoutButton>
+                        <CheckoutButtonText>FINALIZAR PEDIDO</CheckoutButtonText>
+                    </CheckoutButton>
+                </>
+                ) : (
+                    <EmptyCart>                   
+                        <Icon name='remove-shopping-cart' size={100} color='#eee' />
+                        <EmptyCartText>Seu carrinho está vazio</EmptyCartText>
+                    </EmptyCart>
+                )}
             </CartContainer>
         </Container>
     );
